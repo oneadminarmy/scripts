@@ -122,8 +122,16 @@ if ($Apply) {
                 $r.Action = 'Removed'
             }
             catch {
-                $r.Action = "Failed: $($_.Exception.Message)"
-                Write-Warning "Could not remove $($r.UserPrincipalName) from $($r.Group): $($_.Exception.Message)"
+                # Graph can still list a member for a short time after removal. A second run then gets
+                # Not Found, or Bad Request saying the reference does not exist: the member is already gone.
+                $detail = "$($_.ErrorDetails.Message) $($_.Exception.Message)"
+                if ($detail -match 'NotFound|Not Found|does not exist|do not exist') {
+                    $r.Action = 'Already removed'
+                }
+                else {
+                    $r.Action = "Failed: $($_.Exception.Message)"
+                    Write-Warning "Could not remove $($r.UserPrincipalName) from $($r.Group): $($_.Exception.Message)"
+                }
             }
         }
     }
