@@ -211,7 +211,7 @@ for ($n = 0; $n -lt $lines.Count; $n++) {
 # PSScriptAnalyzer, when available
 if (Get-Module -ListAvailable -Name PSScriptAnalyzer) {
     Import-Module PSScriptAnalyzer
-    foreach ($r in @(Invoke-ScriptAnalyzer -Path $full -Severity Error, Warning)) {
+    foreach ($r in @(Invoke-ScriptAnalyzer -Path $full -Severity Error, Warning -WhatIf:$false)) {
         $sev = if ("$($r.Severity)" -eq 'Error') { 'High' } else { 'Low' }
         Add-Finding $sev $r.Line "Analyzer: $($r.RuleName)" $r.Message
     }
